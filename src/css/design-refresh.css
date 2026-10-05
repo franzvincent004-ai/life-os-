@@ -1,0 +1,234 @@
+/* ==================== 07 · DESIGN · APPLE-HEALTH-STIL ====================
+   Prinzipien: reines Schwarz, flache graue Karten, keine Verläufe/Glows,
+   SF-Systemschrift, große fette Titel, Farbe nur als Kategorie-Akzent.      */
+:root{
+  --bg:#000; --surface:#1c1c1e; --surface-2:#2c2c2e; --surface-3:#3a3a3c;
+  --border:#38383a; --border-soft:rgba(84,84,88,.36); --glass-border:rgba(84,84,88,.36);
+  --text:#fff; --text-2:rgba(235,235,245,.78); --text-3:rgba(235,235,245,.6);
+  --accent:#0a84ff; --accent-light:rgba(10,132,255,.18); --health-blue:#0a84ff;
+  --ios-red:#ff375f; --ios-orange:#ff9f0a; --ios-green:#30d158; --ios-teal:#64d2ff; --ios-purple:#bf5af2;
+  --radius:20px; --card-radius:20px;
+  --card-bg:#1c1c1e; --card-border:0 solid transparent; --card-shadow:none;
+  --sf:-apple-system,BlinkMacSystemFont,"SF Pro Display","SF Pro Text","Inter","Segoe UI",system-ui,sans-serif;
+}
+html,body{background:#000!important;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
+body,button,input,select,textarea,.font-display,.font-mono:not(code){font-family:var(--sf)!important}
+body::before,.orb{display:none!important}
+
+/* ---------- Typografie (iOS Large Title) ---------- */
+h1,.ux-page-title,#view-today h1{font-weight:800!important;letter-spacing:-.025em!important;line-height:1.08!important;color:#fff!important;
+  background:none!important;-webkit-text-fill-color:currentColor!important}
+.ux-page-title svg{display:none!important}
+h2,h3{letter-spacing:-.015em!important}
+.ux-eyebrow,.lifeos2-settings-label,.ux-metric-card__label,.streak-card__eyebrow,.streak-modal__label{
+  font-family:var(--sf)!important;letter-spacing:0!important;text-transform:none!important;font-weight:600!important}
+
+/* ---------- Karten: flach, grau, ohne Rand ---------- */
+.surface,.ux-chart-card,.dashboard-widget,[class*="health-card"],.lifeos2-settings-group,.streak-card{
+  background:#1c1c1e!important;border:0!important;box-shadow:none!important;border-radius:var(--card-radius)!important;backdrop-filter:none!important}
+.ux-metric-card{background:#1c1c1e!important;border:0!important;box-shadow:none!important;backdrop-filter:none!important;border-radius:16px!important;padding:14px!important}
+.surface:active,.dashboard-widget:active,.ux-metric-card:active{transform:scale(.985);transition:transform .15s}
+.ux-metric-card__label{font-size:13px!important;color:var(--text-3)!important}
+.ux-metric-card__value{font-size:28px!important;font-weight:700!important;letter-spacing:-.02em;font-variant-numeric:tabular-nums;font-family:var(--sf)!important}
+.dashboard-widget-heading__title h3{font-size:17px!important;font-weight:600!important}
+.dashboard-page-chevron{color:rgba(235,235,245,.3)!important}
+
+/* ---------- Buttons ---------- */
+.btn-primary,.lifeos2-primary-action{
+  background:var(--page-accent,var(--accent))!important;color:#fff!important;border:0!important;box-shadow:none!important;text-shadow:none!important;
+  border-radius:999px!important;font-weight:600!important;font-size:15px!important;letter-spacing:-.01em;transition:opacity .15s,transform .15s!important}
+.btn-primary:active,.lifeos2-primary-action:active,.btn-ghost:active{opacity:.7;transform:scale(.97)}
+.btn-ghost{background:rgba(118,118,128,.24)!important;border:0!important;border-radius:999px!important;color:var(--accent)!important;font-weight:600!important}
+
+/* ---------- Eingaben (iOS-Felder) ---------- */
+.input-min,.account-gate-input{background:#2c2c2e!important;border:0!important;border-radius:12px!important;box-shadow:none!important;font-weight:500!important}
+.input-min:focus,.account-gate-input:focus{box-shadow:0 0 0 2px var(--accent)!important}
+
+/* ---------- Einstellungen = iOS Inset-Grouped-Liste ---------- */
+.lifeos2-settings-group{overflow:hidden}
+.lifeos2-settings-label{font-size:13px!important;color:var(--text-3)!important}
+.lifeos2-setting-row{border-color:rgba(84,84,88,.36)!important;transition:background .12s}
+.lifeos2-setting-row:active{background:#2c2c2e}
+
+/* ---------- Tab-Bar (iOS, schwebendes Glas) ---------- */
+.bottom-nav{background:rgba(28,28,30,.78)!important;backdrop-filter:blur(30px) saturate(1.8)!important;-webkit-backdrop-filter:blur(30px) saturate(1.8)!important;
+  border:.5px solid rgba(255,255,255,.1)!important;border-radius:30px!important;box-shadow:0 10px 40px rgba(0,0,0,.55)!important}
+.nav-btn{color:rgba(235,235,245,.55)!important;font-size:10px!important;font-weight:600!important;background:transparent!important;box-shadow:none!important;transition:color .15s,transform .15s!important}
+.nav-btn:active{transform:scale(.9)}
+.nav-btn.active{color:var(--accent)!important;background:rgba(118,118,128,.22)!important;box-shadow:none!important}
+.nav-btn.active .nav-icon-svg{filter:none!important}
+
+/* ---------- Header ---------- */
+.lifeos-status-island,.streak-chip{backdrop-filter:none!important}
+#header-player-name{font-family:var(--sf)!important}
+
+/* ---------- Modals = iOS Sheet ---------- */
+#modalContent{background:#1c1c1e!important;border-top-left-radius:14px!important;border-top-right-radius:14px!important}
+.modal-sheet,.modal-content{border-radius:14px!important}
+
+/* ---------- Diverses ---------- */
+::-webkit-scrollbar{width:0;height:0}
+:focus-visible{outline:2px solid var(--accent)!important;outline-offset:2px}
+::selection{background:rgba(10,132,255,.4)}
+.lifeos2-view.active,.view.active{animation:losFade .28s ease-out both}
+@keyframes losFade{from{opacity:0}to{opacity:1}}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+
+/* ==================== LOGO ==================== */
+/* __LOGO_SVG_URI__ wird von build.py durch assets/logo.svg ersetzt */
+.lifeos-logo,
+.lifeos2-sidebar-brand > span,
+.lifeos2-about-card > span{
+  display:inline-block;flex-shrink:0;
+  background:url("__LOGO_SVG_URI__") center/cover no-repeat!important;
+  color:transparent!important;font-size:0!important;border:0!important;
+  border-radius:24%!important;
+  box-shadow:0 0 0 .5px rgba(255,255,255,.12)!important}
+.lifeos-logo--header{width:36px;height:36px}
+
+
+/* Splash: großes Logo statt weißem „L“-Quadrat */
+.splash-logo{
+  background:url("__LOGO_SVG_URI__") center/cover no-repeat!important;
+  border:0!important;border-radius:30px!important;
+  box-shadow:0 0 0 .5px rgba(255,255,255,.12),0 20px 60px rgba(0,0,0,.6)!important}
+.splash-l-mark{opacity:0!important}
+.splash-logo-glow{opacity:.25!important}
+
+/* ==================== STREAKS ==================== */
+.streak-flame{display:block;flex-shrink:0;overflow:visible}
+
+/* Header-Chip */
+.streak-chip{display:inline-flex;align-items:center;gap:4px;height:34px;padding:0 11px 0 8px;flex-shrink:0;
+  border-radius:999px;border:0;background:rgba(118,118,128,.24);
+  color:var(--text-3);font-weight:800;font-size:14px;font-variant-numeric:tabular-nums;cursor:pointer;
+  transition:transform .2s var(--ease-spring),background .2s,border-color .2s}
+.streak-chip:active{transform:scale(.92)}
+.streak-chip.is-active{color:#ff9f0a;background:rgba(255,159,10,.18)}
+.streak-chip.is-active .streak-flame{animation:flameFlicker 1.6s ease-in-out infinite;transform-origin:50% 90%}
+.streak-chip.is-risk{color:var(--text-2);border-color:rgba(255,149,0,.3);animation:riskPulse 2s ease-in-out infinite}
+
+/* Home-Karte */
+.streak-card{position:relative;overflow:hidden;padding:18px;border-radius:24px;
+  background:linear-gradient(160deg,rgba(255,255,255,.04),rgba(255,255,255,.01)),var(--surface);
+  border:1px solid rgba(255,255,255,.07);box-shadow:var(--card-shadow)}
+.streak-card.is-active{}
+
+.streak-card:empty{display:none}
+.streak-card__main{display:flex;align-items:center;gap:14px}
+.streak-card__flame{width:56px;height:56px;display:grid;place-items:center}
+.streak-card.is-active .streak-card__flame .streak-flame{animation:flameFlicker 1.8s ease-in-out infinite;transform-origin:50% 90%}
+.streak-card__copy{flex:1;min-width:0}
+.streak-card__eyebrow{font-size:15px;font-weight:600;color:#ff9f0a;margin:0}
+.streak-card__copy h3{margin:2px 0 0;font-size:17px;font-weight:600;color:var(--text-3);letter-spacing:-.01em}
+.streak-card__copy h3 span{font-size:34px;color:#fff}
+.streak-card__status{margin:2px 0 0;font-size:12.5px;color:var(--text-3)}
+.streak-card.is-risk .streak-card__status{color:#ffb340}
+.streak-card__best{text-align:right}
+.streak-card__best small{display:block;font-size:13px;color:var(--text-3)}
+.streak-card__best strong{font-size:20px;font-weight:800}
+.streak-card__week{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;margin-top:16px}
+.streak-day{display:flex;flex-direction:column;align-items:center;gap:5px}
+.streak-day i{width:32px;height:32px;border-radius:50%;display:grid;place-items:center;background:#2c2c2e}
+.streak-day.is-done i{background:rgba(255,159,10,.2)}
+.streak-day.is-today span{color:#ff9f0a}
+.streak-day span{font-size:11px;color:var(--text-3);font-weight:600}
+.streak-card__progress{margin-top:14px}
+.streak-card__progress > div{height:4px;border-radius:4px;background:#2c2c2e;overflow:hidden}
+.streak-card__progress > div span{display:block;height:100%;border-radius:inherit;background:#ff9f0a;transition:width .6s var(--ease-out)}
+.streak-card__progress small{display:block;margin-top:7px;font-size:11.5px;color:var(--text-3)}
+.streak-card__cta{margin-top:14px;width:100%;padding:12px;border-radius:999px;border:0;font-weight:600;font-size:15px;color:#ff9f0a;cursor:pointer;background:rgba(255,159,10,.16)}
+.streak-card__cta:active{transform:scale(.98)}
+
+/* Modal */
+.streak-modal__hero{display:flex;align-items:center;justify-content:center;gap:18px;margin:18px 0 6px}
+.streak-modal__hero .streak-flame{animation:flameFlicker 1.8s ease-in-out infinite;transform-origin:50% 90%}
+.streak-modal__hero strong{display:block;font-size:64px;line-height:1;font-weight:800;letter-spacing:-.04em;color:#fff}
+.streak-modal__hero span{color:var(--text-3);font-weight:600}
+.streak-modal__stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:12px}
+.streak-modal__stats div{padding:12px;border-radius:14px;background:#2c2c2e;text-align:center}
+.streak-modal__stats small{display:block;font-size:12px;color:var(--text-3)}
+.streak-modal__stats b{font-size:14px}
+.streak-modal__label{margin:20px 0 8px;font-size:13px;color:var(--text-3)}
+.streak-modal__grid{display:grid;grid-template-columns:repeat(10,1fr);gap:5px}
+.streak-cal{aspect-ratio:1;border-radius:50%;display:grid;place-items:center;font-size:10px;color:var(--text-3);background:#2c2c2e}
+.streak-cal.is-done{background:rgba(255,159,10,.2)}
+.streak-cal.is-today{outline:2px solid rgba(255,255,255,.55);outline-offset:1px}
+.streak-modal__ms{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.streak-ms{display:flex;flex-direction:column;align-items:center;gap:3px;padding:10px 4px;border-radius:14px;background:rgba(255,255,255,.04);opacity:.55}
+.streak-ms.is-reached{opacity:1;background:rgba(255,159,10,.16)}
+.streak-ms b{font-size:15px}.streak-ms small{font-size:9.5px;color:var(--text-3)}
+
+/* Feier-Overlay */
+.streak-celebration{position:fixed;inset:0;z-index:9999;display:grid;place-items:center;cursor:pointer;
+  background:rgba(0,0,0,.85);
+  backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);animation:scFadeIn .3s ease both}
+.streak-celebration.is-leaving{animation:scFadeOut .45s ease both}
+.streak-celebration__inner{display:flex;flex-direction:column;align-items:center;text-align:center;color:#fff}
+.streak-celebration__flame{animation:scFlameIn .7s var(--ease-spring) both}
+.streak-celebration__flame .streak-flame{animation:flameFlicker 1.2s ease-in-out .7s infinite;transform-origin:50% 90%}
+.streak-celebration__num{margin-top:-14px;font-size:84px;font-weight:900;line-height:1;letter-spacing:-.05em;
+  color:#fff;
+  animation:scPop .5s var(--ease-spring) .25s both}
+.streak-celebration p{margin:6px 0 0;font-size:22px;font-weight:800;animation:scUp .4s ease .4s both}
+.streak-celebration__sub{margin-top:6px;font-size:13px;color:rgba(255,255,255,.7);animation:scUp .4s ease .5s both}
+.streak-celebration__xp{margin-top:12px;padding:8px 16px;border-radius:999px;font-weight:800;color:#1a0d00;
+  background:linear-gradient(180deg,#ffd60a,#ff9500);animation:scPop .5s var(--ease-spring) .6s both}
+
+@keyframes flameFlicker{0%,100%{transform:scale(1) rotate(0)}25%{transform:scale(1.04,.97) rotate(-2deg)}50%{transform:scale(.97,1.05) rotate(1.5deg)}75%{transform:scale(1.03,.98) rotate(-1deg)}}
+@keyframes riskPulse{0%,100%{box-shadow:0 0 0 0 rgba(255,149,0,0)}50%{box-shadow:0 0 0 4px rgba(255,149,0,.18)}}
+@keyframes scFadeIn{from{opacity:0}to{opacity:1}}
+@keyframes scFadeOut{to{opacity:0;transform:scale(1.04)}}
+@keyframes scFlameIn{from{transform:scale(.2) translateY(60px);opacity:0}to{transform:none;opacity:1}}
+@keyframes scPop{from{transform:scale(.4);opacity:0}to{transform:none;opacity:1}}
+@keyframes scUp{from{transform:translateY(10px);opacity:0}to{transform:none;opacity:1}}
+.streak-card{margin:0 0 18px}
+
+/* Apple-Feinschliff: keine Eyebrows/Icons über Seitentiteln, keine Hero-Glows */
+.lifeos2-page-header .ux-eyebrow,.lifeos2-page-header > div > svg,.lifeos2-page-header h1 > svg,.lifeos2-page-header h2 > svg{display:none!important}
+.ux-dashboard-hero,.ux-dashboard-hero::before,.ux-dashboard-hero::after,header::before,header::after{background:none!important;box-shadow:none!important}
+.ux-metric-card__label,[class*="__label"]{letter-spacing:.01em!important}
+
+/* ---------- Streak als Dashboard-Widget ---------- */
+.streak-card{margin:0!important;cursor:pointer}
+.streak-card .dashboard-widget-heading{margin-bottom:6px}
+.streak-card .dashboard-widget-heading__title h3{color:#ff9f0a!important}
+.streak-widget-icon{display:grid;place-items:center;background:none!important}
+.streak-card__main{align-items:flex-end}
+.streak-card__copy h3 span{font-size:40px;font-weight:700;letter-spacing:-.03em}
+.dashboard-widget[data-variant="week"] [data-widget-panel="week"],
+.dashboard-widget[data-variant="progress"] [data-widget-panel="progress"]{display:block}
+.dashboard-widget[data-variant="week"] .streak-card__week{display:grid}
+.streak-card:not(.dashboard-widget) [data-widget-panel="progress"]{display:none}
+/* kompakt & halb: nur Zahl + Status */
+.streak-card[data-size="compact"] [data-widget-panel],
+.streak-card[data-size="compact"] .streak-card__best,
+.streak-card[data-size="compact"] .streak-card__cta{display:none!important}
+.streak-card[data-size="half"] .streak-card__best{display:none}
+.streak-card[data-size="half"] .streak-card__week{gap:3px}
+.streak-card[data-size="half"] .streak-day i{width:22px;height:22px}
+.streak-card[data-size="half"] .streak-day i .streak-flame{width:11px;height:11px}
+.streak-card[data-size="half"] .streak-card__cta{padding:9px;font-size:13px}
+
+/* ---------- Habit-Auswahl: Cheat = rot, Gut = grün ---------- */
+.habit-choice-grid button{transition:background .15s,color .15s,border-color .15s,transform .12s!important}
+.habit-choice-grid button:active{transform:scale(.96)}
+.habit-choice-grid button.active[data-tone="good"]{background:rgba(48,209,88,.18)!important;border-color:#30d158!important;color:#30d158!important}
+.habit-choice-grid button.active[data-tone="bad"]{background:rgba(255,69,58,.18)!important;border-color:#ff453a!important;color:#ff453a!important}
+.habit-choice-grid button.active[data-tone="mid"]{background:rgba(255,159,10,.18)!important;border-color:#ff9f0a!important;color:#ff9f0a!important}
+.habit-choice-grid button.active small{color:inherit!important;opacity:.85}
+
+/* ---------- Kalorien-Widget ---------- */
+.calorie-widget{padding:18px!important}
+.calorie-widget .dashboard-widget-heading__title h3{color:#ff9f0a!important}
+.calorie-widget-icon{color:#ff9f0a;display:grid;place-items:center;background:none!important}
+.calorie-widget-date{font-size:13px;color:var(--text-3);font-weight:600}
+.calorie-widget .calorie-entry-compact{margin:4px 0 0!important;padding:0!important;background:none!important;border:0!important;box-shadow:none!important}
+.calorie-widget .calorie-compact-intro .calorie-compact-icon,.calorie-widget .calorie-compact-intro p{display:none}
+.calorie-widget-save{margin-top:14px;width:100%;padding:12px;border:0;border-radius:999px;font-weight:600;font-size:15px;color:#fff;background:#ff9f0a;cursor:pointer}
+.calorie-widget-save:active{opacity:.7;transform:scale(.98)}
+.calorie-widget[data-size="half"] .calorie-compact-intro small,.calorie-widget[data-size="half"] .calorie-goal-button{display:none}
+.calorie-widget .calorie-compact-value,.calorie-widget .calorie-goal-button{background:#2c2c2e!important;border:0!important;border-radius:14px!important}
+.calorie-widget .calorie-goal-button{color:#0a84ff!important;font-size:14px!important;font-weight:600!important}
+#save-day-btn{background:#0a84ff!important;color:#fff!important}
+.calorie-widget-icon svg{color:#ff9f0a!important;stroke:#ff9f0a!important}

@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#1a1f2e"/><stop offset="1" stop-color="#07080c"/>
+    </linearGradient>
+    <linearGradient id="ring" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#3ee8ff"/><stop offset=".5" stop-color="#4f8cff"/><stop offset="1" stop-color="#b45cff"/>
+    </linearGradient>
+    <linearGradient id="mark" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#ffffff"/><stop offset="1" stop-color="#c9d4ff"/>
+    </linearGradient>
+    <radialGradient id="glow" cx=".3" cy=".2" r=".9">
+      <stop offset="0" stop-color="#4f8cff" stop-opacity=".45"/><stop offset=".6" stop-color="#4f8cff" stop-opacity="0"/>
+    </radialGradient>
+    <filter id="soft" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="10"/></filter>
+  </defs>
+  <rect width="512" height="512" rx="116" fill="url(#bg)"/>
+  <rect width="512" height="512" rx="116" fill="url(#glow)"/>
+  <rect x="3" y="3" width="506" height="506" rx="113" fill="none" stroke="#fff" stroke-opacity=".12" stroke-width="6"/>
+  <!-- Fortschrittsring (glow + scharf) -->
+  <g transform="rotate(-90 256 256)" fill="none" stroke-linecap="round">
+    <circle cx="256" cy="256" r="168" stroke="#fff" stroke-opacity=".07" stroke-width="30"/>
+    <circle cx="256" cy="256" r="168" stroke="url(#ring)" stroke-width="30" stroke-dasharray="845 1056" filter="url(#soft)" opacity=".8"/>
+    <circle cx="256" cy="256" r="168" stroke="url(#ring)" stroke-width="30" stroke-dasharray="845 1056"/>
+  </g>
+  <!-- L, dessen Fuß als Aufwärtspfeil weiterläuft -->
+  <path d="M204 150 V330 H252 L312 270" fill="none" stroke="url(#mark)" stroke-width="44" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M352 230 L272 240 L342 310 Z" fill="#dfe6ff" stroke="#dfe6ff" stroke-width="16" stroke-linejoin="round"/>
+  <!-- Ringende -->
+  <circle cx="96" cy="204" r="24" fill="#3ee8ff" filter="url(#soft)"/>
+  <circle cx="96" cy="204" r="11" fill="#fff"/>
+</svg>

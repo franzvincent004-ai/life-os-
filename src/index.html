@@ -1,0 +1,1350 @@
+<!doctype html>
+<!--
+  ============================================================================
+  LIFE OS · QUELL-HTML (Template)
+  ============================================================================
+  Diese Datei ist NICHT direkt lauffähig – sie enthält Platzhalter, die
+  build.py durch die Dateien aus src/ ersetzt:
+
+    js/app.bundle.js        ES-Modul: App-Kern, Chart.js, Three.js (Vite-Build, minifiziert)
+    css/app.css             Tailwind + App-Styles (Vite-Build, formatiert)
+    css/design-refresh.css  Design-Überarbeitung 2026 (zuletzt geladen = gewinnt)
+    legacy/**.js            lesbare Feature-Module (Habits, Gym, Schule, Shop …)
+
+  Ausgabe:  python3 build.py  ->  release/Life-OS.html
+
+  AUFBAU DIESER DATEI
+  01 · HEAD, META & ICONS
+  02 · ASSETS (Platzhalter)
+  03 · SPLASH-SCREEN & ACCOUNT-GATE
+  04 · APP-SHELL: HEADER, TABS, VIEWS & MODALS
+  05 · DESIGN-REFRESH (Platzhalter)
+
+  Alle Daten-Schlüssel im localStorage beginnen mit "lifeos:".
+  ============================================================================
+-->
+<html lang="de">
+  <head>
+    <!-- ==================== 01 · META & APP-ASSETS ==================== -->
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, viewport-fit=cover"
+    />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <meta name="apple-mobile-web-app-title" content="Life OS" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="theme-color" content="#0A0A0A" />
+    <meta name="color-scheme" content="dark light" />
+    <meta
+      name="description"
+      content="Life OS – persönliche Habit-, Gym- und Schul-Tracker. Alles lokal auf deinem Gerät."
+    />
+    <meta name="format-detection" content="telephone=no" />
+    <title>Life OS</title>
+
+    <!-- Icons -->
+    <link rel="icon" href="__LOGO_SVG_URI__" type="image/svg+xml" />
+    <link
+      rel="apple-touch-icon"
+      sizes="180x180"
+      href="__LOGO_PNG_URI__"
+    />
+
+    <!-- ==================== 02 · ASSETS ==================== -->
+    <!-- @inline-module js/app.bundle.js -->
+    <!-- @inline-style css/app.css -->
+  <!-- @inline-legacy -->
+  </head>
+  <body>
+    <div
+      id="phase4-live-region"
+      class="phase4-sr-only"
+      aria-live="polite"
+      aria-atomic="true"
+    ></div>
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+    <canvas id="confetti-canvas"></canvas>
+
+    <!-- ==================== 03.1 · SPLASH-SCREEN ==================== -->
+    <div id="splash">
+      <div class="splash-flash" id="splash-flash"></div>
+      <div class="splash-bg-grid"></div>
+      <div class="splash-ring splash-ring-1"></div>
+      <div class="splash-ring splash-ring-2"></div>
+      <div class="splash-ring splash-ring-3"></div>
+      <div class="splash-particles" id="splash-particles"></div>
+      <div class="splash-center">
+        <div class="splash-line" id="splash-line"></div>
+        <div class="splash-logo-wrap" id="splash-logo-wrap">
+          <div class="splash-logo-glow"></div>
+          <div class="splash-logo" aria-label="Life OS">
+            <span class="splash-l-mark">L</span>
+            <span class="splash-logo-scan"></span>
+          </div>
+        </div>
+        <h1 class="splash-title" id="splash-title">LIFE OS</h1>
+        <p class="splash-sub" id="splash-sub">FOCUS · LEVEL UP</p>
+        <div class="splash-loader" id="splash-loader">
+          <div class="splash-loader-bar"></div>
+        </div>
+        <p class="splash-hint" id="splash-hint">STARTET AUTOMATISCH</p>
+      </div>
+    </div>
+
+    <!-- ==================== 03.2 · ACCOUNT-GATE ==================== -->
+    <div
+      id="account-gate"
+      class="hidden"
+      style="
+        position: fixed;
+        inset: 0;
+        z-index: 650;
+        background: #050505;
+        display: none;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+        overflow: auto;
+      "
+    >
+      <div class="account-gate-card">
+        <div class="account-gate-mini-logo lifeos-logo" role="img" aria-label="Life OS"></div>
+        <p class="font-mono text-[10px] tracking-[0.25em] opacity-50 mt-4">
+          LIFE OS ACCOUNT
+        </p>
+        <h2 class="font-display text-[28px] font-bold mt-2">Willkommen</h2>
+        <p
+          id="account-gate-copy"
+          class="text-[13px] mt-1 mb-5"
+          style="color: #a3a3a3"
+        >
+          Erstelle dein Konto und bleib automatisch angemeldet.
+        </p>
+
+        <div class="account-gate-tabs">
+          <button
+            type="button"
+            id="gate-tab-create"
+            onclick="setAccountGateMode('create')"
+          >
+            Konto erstellen
+          </button>
+          <button
+            type="button"
+            id="gate-tab-login"
+            onclick="setAccountGateMode('login')"
+          >
+            Einloggen
+          </button>
+        </div>
+
+        <div id="gate-create-panel" class="space-y-3 mt-4">
+          <input
+            id="gate-create-name"
+            type="text"
+            maxlength="18"
+            placeholder="Dein Anzeigename"
+            autocomplete="name"
+            class="account-gate-input"
+          />
+          <input
+            id="gate-create-user"
+            type="text"
+            maxlength="20"
+            placeholder="Benutzername"
+            autocomplete="username"
+            autocapitalize="none"
+            class="account-gate-input"
+          />
+          <div class="account-password-wrap">
+            <input
+              id="gate-create-pass"
+              type="password"
+              maxlength="64"
+              placeholder="Passwort (mind. 4 Zeichen)"
+              autocomplete="new-password"
+              class="account-gate-input"
+            />
+            <button
+              type="button"
+              onclick="toggleLocalPassword('gate-create-pass',this)"
+            >
+              👁
+            </button>
+          </div>
+          <p id="gate-create-error" class="account-gate-error"></p>
+          <button
+            type="button"
+            onclick="createLocalAccount('gate')"
+            class="account-gate-primary"
+          >
+            Konto erstellen
+          </button>
+        </div>
+
+        <div id="gate-login-panel" class="space-y-3 mt-4 hidden">
+          <div id="gate-known-accounts" class="hidden"></div>
+          <input
+            id="gate-login-user"
+            type="text"
+            maxlength="20"
+            placeholder="Benutzername"
+            autocomplete="username"
+            autocapitalize="none"
+            class="account-gate-input"
+          />
+          <div class="account-password-wrap">
+            <input
+              id="gate-login-pass"
+              type="password"
+              maxlength="64"
+              placeholder="Passwort"
+              autocomplete="current-password"
+              class="account-gate-input"
+            />
+            <button
+              type="button"
+              onclick="toggleLocalPassword('gate-login-pass',this)"
+            >
+              👁
+            </button>
+          </div>
+          <p id="gate-login-error" class="account-gate-error"></p>
+          <button
+            id="gate-login-submit"
+            type="button"
+            onclick="loginLocalAccount('gate')"
+            class="account-gate-primary"
+          >
+            Einloggen
+          </button>
+          <div class="grid grid-cols-2 gap-2">
+            <button
+              type="button"
+              onclick="repairLocalLogin()"
+              class="py-2.5 text-[10px] font-bold rounded-[12px]"
+              style="
+                color: #fbbf24;
+                border: 1px solid rgba(251, 191, 36, 0.25);
+                background: rgba(251, 191, 36, 0.06);
+              "
+            >
+              Login reparieren
+            </button>
+            <button
+              type="button"
+              onclick="document.getElementById('gate-account-file').click()"
+              class="py-2.5 text-[10px] font-bold rounded-[12px]"
+              style="color: #a3a3a3; border: 1px solid #292929"
+            >
+              Konto-Datei laden
+            </button>
+          </div>
+          <input
+            id="gate-account-file"
+            type="file"
+            accept=".json,.lifeos"
+            class="hidden"
+            onchange="importBackupFile(event)"
+          />
+        </div>
+
+        <p class="text-[10px] leading-relaxed mt-5" style="color: #666">
+          🔒 Dein Konto wird sicher in diesem Browser gespeichert und bleibt bei
+          neuen Netlify-Versionen erhalten.
+        </p>
+      </div>
+    </div>
+
+    <!-- ==================== 04 · APP-SHELL ==================== -->
+    <div id="app" class="hidden">
+      <aside
+        id="lifeos-sidebar"
+        class="lifeos-sidebar"
+        aria-label="Life OS Navigation"
+      ></aside>
+      <header
+        class="max-w-[1280px] mx-auto px-4 sm:px-6 md:px-8 pt-5 pb-3 flex items-center justify-between"
+        style="padding-top: calc(12px + var(--safe-top))"
+      >
+        <div class="flex items-center gap-2.5 shrink-0">
+          <span class="lifeos-logo lifeos-logo--header" role="img" aria-label="Life OS Logo"></span>
+          <div>
+            <p
+              class="font-display font-bold text-[17px] tracking-tight leading-none"
+            >
+              Life OS
+            </p>
+            <p
+              class="font-mono text-[10px] mt-0.5 opacity-50 truncate max-w-[90px]"
+              id="header-player-name"
+            ></p>
+          </div>
+        </div>
+        <div
+          class="flex items-center gap-1.5 sm:gap-2 overflow-x-auto max-w-[calc(100vw-115px)] py-1 pl-1 pr-1 no-scrollbar"
+          style="-webkit-overflow-scrolling: touch; scrollbar-width: none"
+        >
+          <button
+            type="button"
+            id="streak-chip"
+            class="streak-chip"
+            onclick="openStreakModal()"
+            aria-label="Streak anzeigen"
+          ></button>
+          <button
+            type="button"
+            id="lifeos-status-island"
+            class="lifeos-status-island"
+            aria-expanded="false"
+            aria-label="Rank und XP anzeigen"
+            title="Rank und XP"
+          >
+            <span class="lifeos-status-island__dot" aria-hidden="true"></span>
+            <span class="lifeos-status-island__content">
+              <span id="rank-badge" class="lifeos-status-island__rank">
+                <span id="rank-stars">○ Unranked</span>
+              </span>
+              <span class="lifeos-status-island__divider" aria-hidden="true"></span>
+              <span id="xp-badge" class="lifeos-status-island__xp">
+                <svg class="header-icon-svg" viewBox="0 0 24 24" aria-hidden="true"><path d="M13 2L5 14h6l-1 8 9-13h-6z"/></svg>
+                <span id="xp-num">0</span><span class="lifeos-status-island__xp-label">XP</span>
+              </span>
+            </span>
+          </button>
+          <button
+            type="button"
+            onclick="openAccountModal()"
+            class="w-8 h-8 rounded-full flex items-center justify-center text-[14px] hover:scale-105 transition-transform shrink-0"
+            style="
+              background: var(--surface-2);
+              border: 1px solid var(--border);
+            "
+            title="Account / Login & Datensicherung"
+          >
+            <svg class="header-icon-svg" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0116 0"/></svg>
+          </button>
+          <button
+            type="button"
+            id="theme-toggle"
+            onclick="openThemeModal()"
+            class="w-8 h-8 rounded-full flex items-center justify-center text-[14px] hover:scale-105 transition-transform shrink-0"
+            style="
+              background: var(--surface-2);
+              border: 1px solid var(--border);
+            "
+            title="Design / Theme anpassen"
+          >
+            <svg class="header-icon-svg" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3a9 9 0 100 18h2a2 2 0 001-4h-1a2 2 0 010-4h5a3 3 0 003-3c0-4-4-7-9-7z"/><circle cx="7" cy="10" r="1"/><circle cx="10" cy="6" r="1"/><circle cx="15" cy="7" r="1"/></svg>
+          </button>
+          <button
+            type="button"
+            id="sfx-toggle"
+            onclick="toggleSfx()"
+            class="w-8 h-8 rounded-full flex items-center justify-center text-[14px] shrink-0"
+            style="
+              background: var(--surface-2);
+              border: 1px solid var(--border);
+            "
+            title="Sound an/aus"
+          >
+            <svg class="header-icon-svg" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9h4l5-4v14l-5-4H4zM17 9a5 5 0 010 6M19 6a9 9 0 010 12"/></svg>
+          </button>
+        </div>
+      </header>
+
+      <main
+        id="main-content"
+        tabindex="-1"
+        class="max-w-[1280px] mx-auto px-4 sm:px-6 md:px-8"
+      >
+        <!-- 04.1 · HEUTE: DASHBOARD, HABITS, KALORIEN & VERLAUF -->
+        <div id="view-today" class="tab-on space-y-5 sm:space-y-7">
+          <section
+            id="dashboard-widget-overview"
+            class="ux-dashboard-hero"
+            aria-labelledby="ux-dashboard-title"
+          >
+            <div class="ux-dashboard-hero__top">
+              <div class="dashboard-today-heading">
+                <p class="ux-eyebrow" id="ux-dashboard-title">
+                  <span class="dashboard-today-icon" aria-hidden="true">♥</span>
+                  Tagesübersicht
+                </p>
+                <p id="ux-current-date" class="ux-dashboard-date">Heute</p>
+              </div>
+              <div class="ux-quick-actions" aria-label="Schnellaktionen">
+                <button
+                  type="button"
+                  class="ux-action-button"
+                  onclick="scrollToDailyEntry()"
+                >
+                  ＋ Tag eintragen
+                </button>
+                <button
+                  type="button"
+                  class="ux-action-button ux-action-button--accent"
+                  onclick="switchTab('insights')"
+                >
+                  Insights öffnen
+                </button>
+              </div>
+            </div>
+            <div class="ux-metric-grid">
+              <article class="ux-metric-card ux-metric-card--score">
+                <span class="ux-metric-card__icon">◎</span>
+                <div>
+                  <p class="ux-metric-card__label">TAGES-SCORE</p>
+                  <p class="ux-metric-card__value">
+                    <span id="ux-hero-score">0</span><small>/100</small>
+                  </p>
+                </div>
+              </article>
+              <article class="ux-metric-card ux-metric-card--productivity">
+                <span class="ux-metric-card__icon">P</span>
+                <div>
+                  <p class="ux-metric-card__label">PRODUKTIVITÄT</p>
+                  <p class="ux-metric-card__value">
+                    <span id="ux-hero-productivity">0</span><small>/100</small>
+                  </p>
+                </div>
+              </article>
+              <article class="ux-metric-card ux-metric-card--focus">
+                <span class="ux-metric-card__icon">F</span>
+                <div>
+                  <p class="ux-metric-card__label">FOKUS</p>
+                  <p class="ux-metric-card__value">
+                    <span id="ux-hero-focus">0</span><small>/100</small>
+                  </p>
+                </div>
+              </article>
+              <article class="ux-metric-card">
+                <span class="ux-metric-card__icon">🔥</span>
+                <div>
+                  <p class="ux-metric-card__label">STREAK</p>
+                  <p class="ux-metric-card__value">
+                    <span id="ux-hero-streak">0</span><small>Tage</small>
+                  </p>
+                </div>
+              </article>
+              <article class="ux-metric-card">
+                <span class="ux-metric-card__icon">↗</span>
+                <div>
+                  <p class="ux-metric-card__label">MOMENTUM</p>
+                  <p class="ux-metric-card__value">
+                    <span id="ux-hero-momentum">0</span><small>%</small>
+                  </p>
+                </div>
+              </article>
+              <article class="ux-metric-card ux-metric-card--forecast">
+                <span class="ux-metric-card__icon">⌁</span>
+                <div>
+                  <p class="ux-metric-card__label">7T PROGNOSE</p>
+                  <p class="ux-metric-card__value">
+                    <span id="ux-hero-forecast">0</span><small>/100</small>
+                  </p>
+                </div>
+              </article>
+            </div>
+          </section>
+          <section id="streak-card" class="dashboard-glass-widget streak-card" aria-label="Streak"><div class="streak-card__body"></div></section>
+
+          <div
+            class="ux-dashboard-core grid lg:grid-cols-[1.02fr_0.98fr] gap-4 sm:gap-5"
+          >
+            <!-- DAILY SPORT CHALLENGE -->
+            <div
+              class="surface p-4 sm:p-5 entrance"
+              style="animation-delay: 0.02s; border: 1.5px solid #fbbf2466"
+              id="challenge-card"
+            >
+              <div class="flex justify-between items-start gap-2">
+                <div style="min-width: 0">
+                  <p
+                    class="font-mono text-[9px] tracking-widest"
+                    style="color: #fbbf24"
+                  >
+                    DAILY CHALLENGE
+                  </p>
+                  <p
+                    class="font-display font-bold text-[16px] mt-1"
+                    id="ch-title"
+                  >
+                    Lade…
+                  </p>
+                </div>
+                <div class="text-right shrink-0">
+                  <p class="font-mono text-[10px] opacity-50" id="ch-progress">
+                    0 / 30
+                  </p>
+                  <p
+                    class="font-bold text-[13px] mt-0.5"
+                    style="color: #fbbf24"
+                  >
+                    TÄGLICH
+                  </p>
+                </div>
+              </div>
+              <p
+                class="text-[13px] mt-2 leading-snug"
+                style="color: var(--text-2)"
+                id="ch-desc"
+              >
+                —
+              </p>
+              <div class="mt-3 flex items-center gap-2">
+                <div
+                  class="flex-1 h-1.5 rounded-full overflow-hidden"
+                  style="background: var(--surface-3)"
+                >
+                  <div
+                    id="ch-bar"
+                    class="h-full rounded-full"
+                    style="
+                      width: 0%;
+                      background: linear-gradient(90deg, #fbbf24, #f59e0b);
+                    "
+                  ></div>
+                </div>
+                <span class="font-mono text-[9px] opacity-40" id="ch-tier"
+                  >Lv.1</span
+                >
+              </div>
+
+              <!-- Timer display -->
+              <div
+                id="ch-timer-box"
+                class="mt-4 text-center"
+                style="display: none"
+              >
+                <p
+                  class="font-mono text-[10px] tracking-widest opacity-50"
+                  id="ch-timer-label"
+                >
+                  TIMER
+                </p>
+                <p
+                  class="font-display font-bold mt-1"
+                  id="ch-timer-display"
+                  style="font-size: 42px; letter-spacing: -0.03em; color: #fff"
+                >
+                  00:00
+                </p>
+                <div
+                  class="mt-2 mx-auto h-1.5 rounded-full overflow-hidden"
+                  style="max-width: 200px; background: var(--surface-3)"
+                >
+                  <div
+                    id="ch-timer-bar"
+                    class="h-full rounded-full"
+                    style="
+                      width: 0%;
+                      background: #fbbf24;
+                      transition: width 0.2s linear;
+                    "
+                  ></div>
+                </div>
+              </div>
+
+              <button
+                type="button"
+                id="ch-btn"
+                onclick="onChallengeBtn()"
+                class="ch-btn"
+              >
+                Timer starten
+              </button>
+            </div>
+
+            <div
+              id="daily-entry-card"
+              class="surface p-5 sm:p-6 md:p-7 entrance"
+              style="animation-delay: 0.04s"
+            >
+              <div
+                class="flex flex-col sm:flex-row justify-between sm:items-center gap-3 mb-4"
+              >
+                <div>
+                  <h3
+                    id="entry-day-title"
+                    class="font-display text-[18px] sm:text-[20px] font-bold"
+                  >
+                    Heute
+                  </h3>
+                  
+                </div>
+                <div
+                  class="flex items-center gap-1.5 overflow-x-auto no-scrollbar pb-0.5"
+                >
+                  <button
+                    id="entry-yesterday-btn"
+                    onclick="setEntryDateOffset(-1)"
+                    class="btn-ghost !py-2 !px-2.5 !text-[10px] shrink-0"
+                  >
+                    ← Gestern
+                  </button>
+                  <button
+                    id="entry-today-btn"
+                    onclick="setEntryDateOffset(0)"
+                    class="btn-ghost !py-2 !px-2.5 !text-[10px] shrink-0"
+                  >
+                    Heute
+                  </button>
+                  <input
+                    type="date"
+                    id="entry-date"
+                    onchange="loadEntryDate()"
+                    class="input-min !py-2 !px-2.5 !text-[10px] !rounded-full !w-auto shrink-0"
+                  />
+                  <button
+                    onclick="openAddHabitModal()"
+                    class="btn-ghost !py-2 !px-2.5 !text-[10px] shrink-0"
+                  >
+                    + Habit
+                  </button>
+                </div>
+              </div>
+              <div id="habits-container" class="space-y-2.5"></div>
+
+              <div
+                class="mt-4 pt-4 border-t"
+                style="border-color: var(--border-soft)"
+              >
+                <div class="grid grid-cols-2 gap-2.5">
+                  <div>
+                    <label
+                      class="font-mono text-[10px] mb-1 block"
+                      style="color: var(--text-2)"
+                      >Aus €</label
+                    >
+                    <div class="number-wrap">
+                      <input
+                        id="in-aus"
+                        type="number"
+                        step="0.01"
+                        placeholder="0"
+                        class="input-min !py-2.5 !text-[13px]"
+                      />
+                      <div class="stepper">
+                        <button
+                          class="step-btn up"
+                          onclick="adjustMoney('in-aus',5)"
+                        >
+                          +</button
+                        ><button
+                          class="step-btn"
+                          onclick="adjustMoney('in-aus',-5)"
+                        >
+                          −
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                  <div>
+                    <label
+                      class="font-mono text-[10px] mb-1 block"
+                      style="color: var(--text-2)"
+                      >Ein €</label
+                    >
+                    <div class="number-wrap">
+                      <input
+                        id="in-ein"
+                        type="number"
+                        step="0.01"
+                        placeholder="0"
+                        class="input-min !py-2.5 !text-[13px]"
+                      />
+                      <div class="stepper">
+                        <button
+                          class="step-btn up"
+                          onclick="adjustMoney('in-ein',5)"
+                        >
+                          +</button
+                        ><button
+                          class="step-btn"
+                          onclick="adjustMoney('in-ein',-5)"
+                        >
+                          −
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <input
+                  id="in-note"
+                  type="text"
+                  placeholder="Notiz..."
+                  class="input-min !text-[12px] mt-2.5 !py-2.5"
+                />
+                <button
+                  id="save-day-btn"
+                  onclick="saveToday()"
+                  class="w-full btn-primary mt-3.5"
+                >
+                  Heute speichern
+                </button>
+              </div>
+            </div>
+          <!-- Kalorien als eigenes Dashboard-Widget (Registry-id "kcal") -->
+          <section id="calorie-widget" class="dashboard-glass-widget calorie-widget" aria-label="Kalorien">
+            <div class="dashboard-widget-heading">
+              <div class="dashboard-widget-heading__title">
+                <span class="dashboard-widget-icon calorie-widget-icon" aria-hidden="true"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3c2 3.5 5 5.5 5 10a5 5 0 0 1-10 0c0-2.5 1.2-4 2.2-5.3.4 1.6 1.3 2.5 1.8 2.5-.4-2.4-.2-4.8 1-7.2z"/></svg></span>
+                <div><p class="ux-eyebrow">KALORIEN</p><h3>Kalorien</h3></div>
+              </div>
+              <span class="calorie-widget-date" id="calorie-widget-date">Heute</span>
+            </div>
+                <div id="calorie-entry-panel" class="calorie-entry-compact">
+                  <div class="calorie-compact-intro">
+                    <span class="calorie-compact-icon">K</span>
+                    <div>
+                      <p>KALORIENBILANZ</p>
+                      <h4>Gegessen minus verbrannt</h4>
+                      <small id="calorie-goal-summary">Ziel zwischen −200 und +200 kcal</small>
+                      <strong id="calorie-goal-state">Ziel erreicht</strong>
+                    </div>
+                  </div>
+                  <label class="calorie-compact-input">
+                    <span>KALORIEN GEGESSEN</span>
+                    <div class="number-wrap">
+                      <input
+                        id="in-kcal-eaten"
+                        type="number"
+                        min="0"
+                        step="20"
+                        placeholder="0"
+                        oninput="updateCalorieBalancePreview()"
+                        onchange="snapCaloriesToTwenty('in-kcal-eaten')"
+                        class="input-min !py-2.5 !text-[13px] !font-bold"
+                      />
+                      <div class="stepper">
+                        <button class="step-btn up" onclick="adjustCaloriesEaten(20)">+</button>
+                        <button class="step-btn" onclick="adjustCaloriesEaten(-20)">−</button>
+                      </div>
+                    </div>
+                  </label>
+                  <div class="calorie-compact-value">
+                    <span>VERBRANNT</span>
+                    <strong id="calorie-burned-preview">0 kcal</strong>
+                    <small>aus deinem Habit</small>
+                  </div>
+                  <div class="calorie-compact-value">
+                    <span>TAGESBILANZ</span>
+                    <strong id="calorie-net-preview">0 kcal</strong>
+                    <small id="calorie-net-label">Ausgeglichen</small>
+                    <span id="calorie-balance-badge" hidden>0 kcal</span>
+                  </div>
+                  <button type="button" class="calorie-goal-button" onclick="openCalorieBalanceGoalModal()">Ziel einstellen</button>
+                </div>
+            <button type="button" class="calorie-widget-save" onclick="saveToday()">Speichern</button>
+          </section>
+          </div>
+
+          <div id="dashboard-stats-widget" class="space-y-3 entrance" style="animation-delay: 0.06s">
+            <div class="flex justify-between items-end">
+              <h3 class="font-display text-[18px] sm:text-[22px] font-bold">
+                Statistiken
+              </h3>
+            </div>
+            <div
+              class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2.5"
+              id="stats-grid"
+            ></div>
+            <div class="grid md:grid-cols-2 xl:grid-cols-3 gap-3 sm:gap-4">
+              <div class="surface p-4 sm:p-5">
+                <div class="flex justify-between items-center mb-3">
+                  <h4 class="font-display font-bold text-[14px]">
+                    Punkte • 14T
+                  </h4>
+                </div>
+                <canvas id="chart-mini" height="180"></canvas>
+              </div>
+              <div
+                id="money-chart-card"
+                class="surface p-4 sm:p-5 expandable-chart-card"
+                role="button"
+                tabindex="0"
+                aria-expanded="false"
+                onclick="toggleMoneyChartDetails()"
+                onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();toggleMoneyChartDetails()}"
+              >
+                <div class="flex justify-between items-center mb-3">
+                  <div>
+                    <h4 class="font-display font-bold text-[14px]">
+                      Geld-Differenz • 14T
+                    </h4>
+                    
+                  </div>
+                  <span class="chart-expand-icon" aria-hidden="true">⌄</span>
+                </div>
+                <div class="chart-fixed-height">
+                  <canvas id="chart-money"></canvas>
+                </div>
+                <div
+                  id="money-chart-details"
+                  class="chart-details"
+                  hidden
+                  onclick="event.stopPropagation()"
+                >
+                  <article>
+                    <h5>Einnahmen (+)</h5>
+                    <div class="chart-detail-height">
+                      <canvas id="chart-income"></canvas>
+                    </div>
+                  </article>
+                  <article>
+                    <h5>Ausgaben (−)</h5>
+                    <div class="chart-detail-height">
+                      <canvas id="chart-expenses"></canvas>
+                    </div>
+                  </article>
+                </div>
+              </div>
+              <div
+                id="calorie-chart-card"
+                class="surface p-4 sm:p-5 md:col-span-2 xl:col-span-1 expandable-chart-card"
+                role="button"
+                tabindex="0"
+                aria-expanded="false"
+                onclick="toggleCalorieChartDetails()"
+                onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();toggleCalorieChartDetails()}"
+              >
+                <div class="flex justify-between items-start gap-2 mb-3">
+                  <div>
+                    <h4 class="font-display font-bold text-[14px]">
+                      Kalorien-Differenz • 14T
+                    </h4>
+                    
+                  </div>
+                  <div class="flex items-center gap-2">
+                    <span
+                      id="calorie-chart-summary"
+                      class="font-mono text-[9px] px-2 py-1 rounded-full"
+                      style="background: var(--surface-2)"
+                      >–</span
+                    ><span class="chart-expand-icon" aria-hidden="true">⌄</span>
+                  </div>
+                </div>
+                <div class="chart-fixed-height">
+                  <canvas id="chart-calories"></canvas>
+                </div>
+                <div
+                  id="calorie-chart-details"
+                  class="chart-details"
+                  hidden
+                  onclick="event.stopPropagation()"
+                >
+                  <article>
+                    <h5>Kalorien gegessen</h5>
+                    <div class="chart-detail-height">
+                      <canvas id="chart-calories-eaten"></canvas>
+                    </div>
+                  </article>
+                  <article>
+                    <h5>Kalorien verbrannt</h5>
+                    <div class="chart-detail-height">
+                      <canvas id="chart-calories-burned"></canvas>
+                    </div>
+                  </article>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div id="dashboard-history-widget" class="surface p-4 sm:p-6">
+            <div
+              class="flex flex-col sm:flex-row justify-between sm:items-center gap-3 mb-4"
+            >
+              <div>
+                <h3 class="font-display text-[16px] sm:text-[18px] font-bold">
+                  Alle Tage
+                </h3>
+                
+              </div>
+              <div class="flex flex-wrap gap-2">
+                <button
+                  onclick="openAllDaysModal()"
+                  class="btn-primary !py-2 !px-3 !text-[11px]"
+                >
+                  ☰ Große Übersicht</button
+                ><button
+                  onclick="exportCSV()"
+                  class="btn-ghost !py-2 !px-2.5 !text-[11px]"
+                >
+                  CSV</button
+                ><button
+                  onclick="clearAll()"
+                  class="btn-ghost !py-2 !px-2.5 !text-[11px] !text-[#F87171]"
+                >
+                  Löschen
+                </button>
+              </div>
+            </div>
+            <div class="overflow-auto -mx-1 px-1 max-h-[520px]">
+              <table class="w-full text-[12px] sm:text-[13px]">
+                <thead
+                  class="font-mono text-[10px] border-b sticky top-0"
+                  style="
+                    color: var(--text-3);
+                    border-color: var(--border-soft);
+                    background: var(--surface);
+                  "
+                >
+                  <tr>
+                    <th class="text-left py-2 font-medium">Datum</th>
+                    <th>Punkte</th>
+                    <th class="hidden sm:table-cell">Details</th>
+                    <th>Geld</th>
+                    <th class="text-right">Ändern</th>
+                  </tr>
+                </thead>
+                <tbody id="history-body"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- 04.2 · GYM & TRAININGSPLÄNE -->
+        <div id="view-gym" class="hidden space-y-5">
+          <div class="flex justify-between items-end gap-3">
+            <div>
+              <h2
+                class="font-display text-[24px] sm:text-[30px] font-bold leading-[0.9]"
+              >
+                Gym
+              </h2>
+              
+            </div>
+            <div class="flex gap-2 shrink-0">
+              <button
+                onclick="openAddTrainingsplanModal()"
+                class="btn-primary !text-[12px] !px-3 !bg-[var(--text)] !text-[var(--bg)]"
+              >
+                + Trainingsplan
+              </button>
+              <button
+                onclick="openAddExerciseModal()"
+                class="btn-primary-green !text-[12px] !px-3"
+              >
+                + Übung
+              </button>
+              <span class="btn-ghost !text-[11px] hidden sm:inline-flex"
+                >Beste: <b id="gym-best">-</b></span
+              >
+            </div>
+          </div>
+
+          <!-- TRAININGSPLÄNE SECTION -->
+          <div class="surface p-4 sm:p-5">
+            <div class="flex justify-between items-center mb-4">
+              <div>
+                <h3 class="font-display font-bold text-[16px] sm:text-[18px]">
+                  Trainingspläne
+                </h3>
+                
+              </div>
+              <button
+                onclick="openAddTrainingsplanModal()"
+                class="btn-primary !text-[12px] !py-2 !px-3.5"
+              >
+                + Neuer Plan
+              </button>
+            </div>
+            <div id="trainingsplaene-container" class="space-y-4"></div>
+          </div>
+          <div
+            class="grid grid-cols-2 md:grid-cols-3 gap-2.5"
+            id="gym-cards"
+          ></div>
+          <div
+            id="gym-stats"
+            class="grid grid-cols-2 md:grid-cols-4 gap-2.5"
+          ></div>
+          <div class="surface p-4 sm:p-5">
+            <h3 class="font-display text-[15px] font-bold mb-3">Neuer PR</h3>
+            <div class="space-y-2.5">
+              <select id="gym-select" class="input-min"></select>
+              <div class="grid grid-cols-2 gap-2.5">
+                <div class="number-wrap">
+                  <input
+                    id="gym-reps"
+                    type="number"
+                    placeholder="Reps"
+                    class="input-min !font-bold"
+                  />
+                  <div class="stepper">
+                    <button class="step-btn up" onclick="adjust('gym-reps',1)">
+                      +</button
+                    ><button class="step-btn" onclick="adjust('gym-reps',-1)">
+                      −
+                    </button>
+                  </div>
+                </div>
+                <div class="number-wrap">
+                  <input
+                    id="gym-weight"
+                    type="number"
+                    placeholder="kg"
+                    class="input-min"
+                  />
+                  <div class="stepper">
+                    <button
+                      class="step-btn up"
+                      onclick="adjust('gym-weight',2.5)"
+                    >
+                      +</button
+                    ><button
+                      class="step-btn"
+                      onclick="adjust('gym-weight',-2.5)"
+                    >
+                      −
+                    </button>
+                  </div>
+                </div>
+              </div>
+              <input
+                id="gym-date"
+                type="date"
+                class="input-min text-sm"
+              /><input
+                id="gym-note"
+                placeholder="Notiz"
+                class="input-min text-sm"
+              /><button onclick="addGym()" class="w-full btn-primary">
+                Speichern
+              </button>
+            </div>
+            <div
+              id="gym-log"
+              class="mt-4 space-y-2 max-h-[200px] overflow-y-auto"
+            ></div>
+          </div>
+        </div>
+
+        <!-- 04.3 · SCHULE, FÄCHER & NOTEN -->
+        <div id="view-school" class="hidden space-y-5">
+          <div
+            class="surface p-5 sm:p-6"
+            style="background: var(--gray-bg); border-color: var(--gray-border)"
+          >
+            <div
+              class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4"
+            >
+              <div>
+                <p
+                  class="font-mono text-[11px] tracking-widest opacity-80"
+                  style="color: var(--text-2)"
+                >
+                  SCHULE & NOTEN
+                </p>
+                <h2
+                  class="font-display text-[26px] sm:text-[32px] font-bold leading-[0.9] mt-1 text-[var(--text)]"
+                >
+                  Noten & Fächer
+                </h2>
+              </div>
+              <div class="flex flex-wrap gap-2.5">
+                <button
+                  onclick="openAddNoteModal()"
+                  class="btn-primary !text-[13px] !py-2.5 !px-4 !bg-[var(--text)] !text-[var(--bg)] font-bold"
+                >
+                  + Note eintragen
+                </button>
+                <button
+                  onclick="openAddFachModal()"
+                  class="btn-ghost !text-[13px] !py-2.5 !px-3.5 font-bold"
+                >
+                  + Fach hinzufügen
+                </button>
+              </div>
+            </div>
+            <div
+              id="schule-stats"
+              class="grid grid-cols-2 md:grid-cols-4 gap-2.5 mt-5"
+            ></div>
+          </div>
+
+          <div class="grid lg:grid-cols-[1.1fr_0.9fr] gap-5">
+            <!-- left column: high contrast Fächer table -->
+            <div class="surface p-4 sm:p-5 overflow-x-auto">
+              <div class="flex justify-between items-center mb-3">
+                <h3
+                  class="font-display font-bold text-[16px] text-[var(--text)]"
+                >
+                  Fächer & Notenübersicht
+                </h3>
+                <button
+                  onclick="openAddFachModal()"
+                  class="btn-ghost !py-1.5 !px-3 !text-[12px]"
+                >
+                  + Fach
+                </button>
+              </div>
+              <table class="w-full text-[13px]">
+                <thead
+                  class="font-mono text-[11px] border-b"
+                  style="color: var(--text-2); border-color: var(--border-soft)"
+                >
+                  <tr>
+                    <th class="text-left py-2.5 font-semibold w-[120px]">
+                      Fach
+                    </th>
+                    <th class="text-left py-2.5 font-semibold">Noten</th>
+                    <th class="w-[65px] text-center py-2.5">Ø</th>
+                    <th class="w-[90px] text-right py-2.5"></th>
+                  </tr>
+                </thead>
+                <tbody id="schule-body"></tbody>
+              </table>
+            </div>
+
+            <!-- right column: overall overlapping line chart with inverted scale (1 top, 6 bottom) -->
+            <div class="surface p-4 sm:p-5">
+              <div
+                class="flex justify-between items-center mb-3 flex-wrap gap-2"
+              >
+                <div>
+                  <h4
+                    class="font-display font-bold text-[15px] text-[var(--text)]"
+                  >
+                    Alle Fächer im Verlauf (übereinander)
+                  </h4>
+                  
+                </div>
+                <div class="flex gap-1 flex-wrap">
+                  <button
+                    onclick="setSchoolPeriod('month')"
+                    id="sch-p-month"
+                    class="period-btn active"
+                  >
+                    Monat
+                  </button>
+                  <button
+                    onclick="setSchoolPeriod('year')"
+                    id="sch-p-year"
+                    class="period-btn"
+                  >
+                    Jahr
+                  </button>
+                  <button
+                    onclick="setSchoolPeriod('all')"
+                    id="sch-p-all"
+                    class="period-btn"
+                  >
+                    Alle
+                  </button>
+                </div>
+              </div>
+              <div class="school-chart-main">
+                <canvas id="chart-schule"></canvas>
+              </div>
+            </div>
+          </div>
+
+          <!-- SINGLE CHARTS FOR EACH SUBJECT -->
+          <div class="surface p-4 sm:p-5">
+            <div class="flex justify-between items-center mb-4">
+              <div>
+                <h3
+                  class="font-display font-bold text-[18px] text-[var(--text)]"
+                >
+                  Einzelne Graphen pro Fach
+                </h3>
+                
+              </div>
+              <button
+                onclick="openAddNoteModal()"
+                class="btn-primary !text-[12px] !py-2 !px-3.5"
+              >
+                + Note eintragen
+              </button>
+            </div>
+            <div
+              id="schule-single-charts-grid"
+              class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"
+            ></div>
+          </div>
+        </div>
+
+        <!-- LIFE OS 3.0 · HEALTH CORE -->
+        <div id="view-health" class="hidden lifeos2-view"></div>
+
+        <!-- LIFE OS 2.0 · ANALYTICS -->
+        <div id="view-analytics" class="hidden lifeos2-view"></div>
+
+        <!-- LIFE OS 2.0 · GOALS -->
+        <div id="view-goals" class="hidden lifeos2-view"></div>
+
+        <!-- 04.4 · INSIGHTS & TRENDS -->
+        <div
+          id="view-insights"
+          class="hidden ux-insights-view"
+          aria-labelledby="insights-title"
+        ></div>
+
+        <!-- LIFE OS 2.0 · WEEKLY REVIEW -->
+        <div id="view-weekly" class="hidden lifeos2-view"></div>
+
+        <!-- LIFE OS 2.0 · MONTHLY REVIEW -->
+        <div id="view-monthly" class="hidden lifeos2-view"></div>
+
+        <!-- LIFE OS 2.0 · SETTINGS -->
+        <div id="view-settings" class="hidden lifeos2-view"></div>
+
+      </main>
+
+      <!-- Version -->
+      <p
+        class="text-center font-mono text-[10px] opacity-35 pb-2 pt-4 tracking-widest"
+        id="app-version"
+      >
+        Version 2.0
+      </p>
+
+      <!-- 04.5 · MOBILE BOTTOM-NAVIGATION -->
+      <nav class="bottom-nav" id="bottom-nav">
+        <button type="button" class="nav-btn active" id="nav-today">
+          <span class="icon"
+            ><svg
+              class="nav-icon-svg nav-icon-sun"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.8"
+              stroke-linecap="round"
+            >
+              <g class="sun-ray">
+                <line x1="12" y1="1" x2="12" y2="3" />
+                <line x1="12" y1="21" x2="12" y2="23" />
+                <line x1="4.22" y1="4.22" x2="5.64" y2="5.64" />
+                <line x1="18.36" y1="18.36" x2="19.78" y2="19.78" />
+                <line x1="1" y1="12" x2="3" y2="12" />
+                <line x1="21" y1="12" x2="23" y2="12" />
+                <line x1="4.22" y1="19.78" x2="5.64" y2="18.36" />
+                <line x1="18.36" y1="5.64" x2="19.78" y2="4.22" />
+              </g>
+              <circle
+                class="sun-core"
+                cx="12"
+                cy="12"
+                r="5"
+                fill="currentColor"
+                stroke="none"
+                opacity="0.9"
+              /></svg></span
+          >Today
+        </button>
+        <button type="button" class="nav-btn" id="nav-gym">
+          <span class="icon"
+            ><svg
+              class="nav-icon-svg"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.8"
+              stroke-linecap="round"
+            >
+              <path
+                d="M6.5 6.5v11M17.5 6.5v11M3 10v4M21 10v4M6.5 12h11M1 11v2M23 11v2"
+              /></svg></span
+          >Gym
+        </button>
+        <button type="button" class="nav-btn" id="nav-school">
+          <span class="icon"
+            ><svg
+              class="nav-icon-svg"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.8"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path d="M4 19.5A2.5 2.5 0 016.5 17H20" />
+              <path
+                d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"
+              />
+              <line x1="8" y1="7" x2="16" y2="7" />
+              <line x1="8" y1="11" x2="14" y2="11" /></svg></span
+          >Schule
+        </button>
+        <button type="button" class="nav-btn" id="nav-insights">
+          <span class="icon">
+            <svg
+              class="nav-icon-svg"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.8"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path d="M4 17l5-5 4 3 7-8" />
+              <path d="M15 7h5v5" />
+              <path d="M4 21h16" opacity=".45" />
+            </svg>
+          </span>
+          Insights
+        </button>
+        <button type="button" class="nav-btn" id="nav-robots">
+          <span class="icon"
+            ><svg
+              class="nav-icon-svg nav-icon-diamond"
+              viewBox="0 0 24 24"
+              fill="none"
+            >
+              <polygon
+                points="12,2 22,9 12,22 2,9"
+                stroke="currentColor"
+                stroke-width="1.8"
+                fill="none"
+              />
+              <line
+                x1="2"
+                y1="9"
+                x2="22"
+                y2="9"
+                stroke="currentColor"
+                stroke-width="1.5"
+              />
+              <polygon
+                class="diamond-glow"
+                points="12,2 22,9 12,22 2,9"
+                fill="currentColor"
+                opacity="0.3"
+              /></svg></span
+          >Roboter
+        </button>
+      </nav>
+    </div>
+    <!-- ENDE 04 · APP-SHELL -->
+
+    <!-- ==================== 04.6 · GLOBALER MODAL-CONTAINER ==================== -->
+    <div
+      id="modalRoot"
+      role="dialog"
+      aria-modal="true"
+      aria-hidden="true"
+      aria-label="Dialog"
+      class="hidden fixed inset-0 z-[400] flex items-end md:items-center justify-center p-0 md:p-6"
+    >
+      <div
+        class="absolute inset-0 bg-black/70 backdrop-blur-[18px]"
+        onclick="closeModal()"
+      ></div>
+      <div
+        class="relative w-full md:max-w-[680px] max-h-[88vh] overflow-y-auto surface !rounded-t-[24px] md:!rounded-[24px] p-5 sm:p-7 md:p-8 shadow-2xl"
+        id="modalContent"
+        style="
+          padding-bottom: calc(110px + var(--safe-bottom));
+          background: var(--surface);
+        "
+      ></div>
+    </div>
+  <!-- ==================== 05 · DESIGN-REFRESH ==================== -->
+  <!-- @inline-style css/design-refresh.css -->
+</body>
+</html>
