@@ -1,0 +1,30 @@
+name: iOS IPA
+on: workflow_dispatch
+jobs:
+  build:
+    runs-on: macos-15
+    defaults: { run: { working-directory: native-app } }
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 22 }
+      - run: npm install
+      - run: npm run setup:ios
+      - name: App-Icon setzen
+        run: |
+          ICON_DIR=ios/App/App/Assets.xcassets/AppIcon.appiconset
+          cp resources/icon.png "$ICON_DIR/AppIcon-512@2x.png"
+      - name: Build (unsigniert)
+        run: |
+          cd ios/App
+          xcodebuild -project App.xcodeproj -scheme App -configuration Release \
+            -sdk iphoneos -destination 'generic/platform=iOS' \
+            -derivedDataPath build \
+            CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO CODE_SIGN_IDENTITY="" build
+      - name: IPA packen
+        run: |
+          cd ios/App/build/Build/Products/Release-iphoneos
+          mkdir Payload && cp -R App.app Payload/
+          zip -qr "$GITHUB_WORKSPACE/LifeOS.ipa" Payload
+      - uses: actions/upload-artifact@v4
+        with: { name: LifeOS-ios, path: LifeOS.ipa }
