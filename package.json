@@ -1,0 +1,21 @@
+{
+  "name": "life-os",
+  "productName": "Life OS",
+  "version": "1.0.0",
+  "description": "Life OS für Windows",
+  "main": "main.js",
+  "scripts": {
+    "web": "cd .. && python build.py && node -e \"require('fs').mkdirSync('windows-app/app',{recursive:true});require('fs').copyFileSync('release/Life-OS.html','windows-app/app/index.html')\"",
+    "start": "electron .",
+    "dist": "electron-builder --win portable nsis"
+  },
+  "devDependencies": { "electron": "^38.0.0", "electron-builder": "^26.0.0" },
+  "build": {
+    "appId": "de.deinname.lifeos",
+    "productName": "Life OS",
+    "files": ["main.js", "app/**"],
+    "win": { "icon": "icon.png" },
+    "nsis": { "oneClick": false, "allowToChangeInstallationDirectory": true },
+    "directories": { "output": "dist" }
+  }
+}
