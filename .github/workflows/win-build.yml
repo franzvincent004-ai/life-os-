@@ -3,16 +3,42 @@ on: workflow_dispatch
 jobs:
   build:
     runs-on: windows-latest
-    defaults: { run: { working-directory: windows-app } }
+    defaults: { run: { shell: bash } }
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with: { node-version: 22 }
       - uses: actions/setup-python@v5
         with: { python-version: '3.12' }
-      - run: npm install
-      - run: npm run web
-      - run: npm run dist
+      - name: App-Dateien erzeugen
+        run: |
+          python build.py
+          mkdir -p winapp/app
+          cp release/Life-OS.html winapp/app/index.html
+          cp native-app/resources/icon.png winapp/icon.png
+          cd winapp
+          cat > main.js <<'JS'
+          const { app, BrowserWindow, shell, Menu } = require('electron');
+          const path = require('path');
+          app.whenReady().then(() => {
+            const win = new BrowserWindow({ width: 1200, height: 850, backgroundColor: '#000000',
+              title: 'Life OS', icon: path.join(__dirname, 'icon.png') });
+            Menu.setApplicationMenu(null);
+            win.loadFile(path.join(__dirname, 'app', 'index.html'));
+            win.webContents.setWindowOpenHandler(({ url }) => { shell.openExternal(url); return { action: 'deny' }; });
+          });
+          app.on('window-all-closed', () => app.quit());
+          JS
+          cat > package.json <<'PKG'
+          { "name": "life-os", "productName": "Life OS", "version": "1.0.0", "main": "main.js",
+            "build": { "appId": "de.deinname.lifeos", "productName": "Life OS",
+              "files": ["main.js", "app/**", "icon.png"], "win": { "icon": "icon.png" },
+              "nsis": { "oneClick": false, "allowToChangeInstallationDirectory": true } } }
+          PKG
+          npm install --save-dev electron@38 electron-builder@26
+      - name: Bauen
+        working-directory: winapp
+        run: npx electron-builder --win portable nsis
         env: { CSC_IDENTITY_AUTO_DISCOVERY: 'false' }
       - uses: actions/upload-artifact@v4
-        with: { name: LifeOS-Windows, path: windows-app/dist/*.exe }
+        with: { name: LifeOS-Windows, path: winapp/dist/*.exe }
